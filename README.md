@@ -15,9 +15,12 @@
 | [Xiaomi Router BE3600 Pro](https://4pda.to/forum/index.php?showtopic=1096055) | [BE3600 Pro](https://4pda.to/forum/index.php?showtopic=1096055)  |
 | [Xiaomi Router BE5000 2.5G](https://4pda.to/forum/index.php?showtopic=1088946) | [BE5000](https://4pda.to/forum/index.php?showtopic=1088946) |
 
+Возможно и какие-то другие на аналогичной платформе
+
 ## Предварительные требования ⚠️
-- **Root-доступ** уже получен ([xmir-patcher](https://github.com/openwrt-xiaomi/xmir-patcher)) 
-- **Инструкция по руту НЕ включена** — читайте 4PDA
+- **Root** уже получен ([xmir-patcher](https://github.com/openwrt-xiaomi/xmir-patcher))
+- **SSH** доступ имеется ([rd15tool](https://github.com/crazytypewriter/rd15tool/))
+- **Инструкция по руту и ssh НЕ включена** — читайте 4PDA
 - **MobaXterm** ([скачать](https://mobaxterm.mobatek.net/download.html)) для SSH/SFTP редактирования
 
 ## 🚀 Установка одной командой
