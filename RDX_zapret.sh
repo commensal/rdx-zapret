@@ -636,7 +636,7 @@ show_menu() {
 
         if [ -d "$INSTALL_PATH" ] && [ -n "$(ls -A "$INSTALL_PATH" 2>/dev/null)" ]; then
             if is_zapret_running; then
-                echo -e "${YELLOW}Zapret установлен${GREEN} и работает${NC}"
+                echo -e "${YELLOW}Zapret установлен${GREEN} и работает!${NC}"
             else
                 echo -e "${YELLOW}Zapret установлен,${RED} но остановлен.${NC}"
             fi
