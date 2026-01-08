@@ -129,12 +129,13 @@ start_zapret_service() {
 }
 
 is_zapret_running() {
-    # Проверяем ключевые процессы zapret
-    if pgrep -x nfqws >/dev/null 2>&1 || pgrep -x tpws >/dev/null 2>&1; then
-        return 0  # запущен
+    # Проверяем процессы nfqws или tpws (игнорируем grep)
+    if pgrep -f "nfqws" >/dev/null 2>&1 || pgrep -f "tpws" >/dev/null 2>&1; then
+        return 0
     fi
-    return 1  # остановлен/не установлен
+    return 1
 }
+
 
 
 ##############################################################################
