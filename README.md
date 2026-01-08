@@ -31,9 +31,8 @@ sh -c "$(curl -fsSL https://raw.githubusercontent.com/commensal/rdx-zapret/main/
 ```
 1. (вкл/выкл) — Остановить/Запустить zapret
 3. Проверить обновление
-5. Принудительная переустановка
-6. Полностью удалить zapret
-0. Выйти (Enter)
+7. Полностью удалить zapret
+9. Выйти (Enter)
 ```
 
 ## ⚙️ Конфигурация
