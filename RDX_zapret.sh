@@ -85,7 +85,6 @@ check_tar() {
 stop_zapret_service() {
     print_info "Попытка остановить сервис zapret..."
 
-    # Сначала пробуем через service (если есть)
     if command -v service >/dev/null 2>&1; then
         debug "Останавливаем через service zapret stop"
         if service zapret stop 2>/dev/null; then
@@ -94,7 +93,6 @@ stop_zapret_service() {
         fi
     fi
 
-    # Классический init.d (OpenWrt / обычный init)
     if [ -x /etc/init.d/zapret ]; then
         debug "Останавливаем /etc/init.d/zapret stop"
         if /etc/init.d/zapret stop 2>/dev/null; then
@@ -164,7 +162,6 @@ download_release() {
     if curl -L -H "User-Agent: Mozilla/5.0" \
         -o "$target_file" \
         "$main_url" 2>/dev/null; then
-
         if [ -f "$target_file" ]; then
             local size
             size=$(wc -c < "$target_file" 2>/dev/null || echo "0")
@@ -329,6 +326,51 @@ download_my_files() {
 }
 
 ##############################################################################
+# ПОЛНОЕ УДАЛЕНИЕ ZAPRET
+##############################################################################
+full_uninstall_zapret() {
+    print_header
+    print_warning "Полное удаление zapret..."
+
+    stop_zapret_service
+
+    if [ -f "$INSTALL_PATH/uninstall_easy.sh" ]; then
+        print_info "Запуск uninstall_easy.sh..."
+        sh "$INSTALL_PATH/uninstall_easy.sh"
+    else
+        print_warning "uninstall_easy.sh не найден, пропускаем"
+    fi
+
+    # Чистим crontab
+    if [ -f "/data/etc/crontabs/root" ]; then
+        print_info "Очистка crontab от записей zapret..."
+        sed -i '/zapret/d' /data/etc/crontabs/root 2>/dev/null || true
+    fi
+
+    # Удаляем патчи cron
+    if [ -f "/data/etc/crontabs/patches/zapret_patch.sh" ]; then
+        print_info "Удаление /data/etc/crontabs/patches/zapret_patch.sh..."
+        rm -f /data/etc/crontabs/patches/zapret_patch.sh 2>/dev/null || true
+    fi
+
+    # Рестарт cron
+    if [ -x /etc/init.d/cron ]; then
+        print_info "Перезапуск cron..."
+        /etc/init.d/cron restart 2>/dev/null || true
+    fi
+
+    # Удаляем каталог zapret
+    if [ -d "$INSTALL_PATH" ]; then
+        print_info "Удаление каталога $INSTALL_PATH..."
+        rm -rf "$INSTALL_PATH" 2>/dev/null || true
+    fi
+
+    print_success "Zapret полностью удалён (насколько это возможно скриптом)"
+    echo ""
+    read -p "Нажмите Enter для продолжения..."
+}
+
+##############################################################################
 # УСТАНОВКА / ПЕРЕУСТАНОВКА
 ##############################################################################
 install_zapret() {
@@ -349,8 +391,13 @@ install_zapret() {
             print_warning "Принудительная переустановка Zapret"
         fi
 
-        # Перед удалением останавливаем сервис
         stop_zapret_service
+
+        # если есть uninstall_easy.sh – попробуем корректно удалить
+        if [ -f "$actual_path/uninstall_easy.sh" ]; then
+            print_info "Запуск uninstall_easy.sh перед переустановкой..."
+            sh "$actual_path/uninstall_easy.sh"
+        fi
 
         if [ -d "$actual_path" ]; then
             print_info "Удаление старой папки..."
@@ -418,6 +465,12 @@ install_zapret() {
             chmod -R 755 "$actual_path" 2>/dev/null
             find "$actual_path" -name "*.sh" -exec chmod +x {} \; 2>/dev/null
             print_success "Права установлены"
+
+            # патчим /opt -> /data перед install_easy
+            if [ "$TEST_MODE" = "false" ]; then
+                print_info "Замена путей /opt/ -> /data/ в файлах zapret..."
+                find "$INSTALL_PATH" -type f -exec sed -i 's|/opt/|/data/|g' {} \; 2>/dev/null
+            fi
 
             if [ "$TEST_MODE" = "true" ]; then
                 print_info "Тестовый режим: zapret не запускается, изменения ограничены $actual_path"
@@ -496,7 +549,6 @@ update_zapret() {
                 else
                     local archive="/tmp/zapret_update_$latest_version.tar.gz"
 
-                    # перед обновлением бинарников останавливаем сервис
                     stop_zapret_service
 
                     if download_release "$latest_version" "$archive"; then
@@ -523,7 +575,6 @@ update_zapret() {
                                 print_error "Бинарники linux-arm не найдены в архиве обновления"
                             fi
 
-                            # после обновления пробуем перезапустить сервис
                             start_zapret_service
 
                             rm -rf "$temp_dir"
@@ -595,17 +646,19 @@ show_menu() {
         echo "1. Проверить обновление"
         echo "2. Принудительно переустановить"
         echo "3. Протестировать работу обхода (не точно)"
-        echo "4. Выйти"
+        echo -e "${RED}4. Полностью удалить zapret${NC}"
+        echo "5. Выйти"
         echo ""
 
-        echo -n "Выберите опцию [1-4] (или Enter для выхода): "
+        echo -n "Выберите опцию [1-5] (или Enter для выхода): "
         read choice
 
         case "$choice" in
             1) update_zapret ;;
             2) install_zapret "true" ;;
             3) test_bypass ;;
-            4|"")
+            4) full_uninstall_zapret ;;
+            5|"")
                 echo ""
                 print_info "Выход..."
                 echo ""
