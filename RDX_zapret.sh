@@ -129,21 +129,13 @@ start_zapret_service() {
 }
 
 is_zapret_running() {
-    # возвращает 0 если запущен, 1 если нет/неопределён
-    if command -v service >/dev/null 2>&1; then
-        if service zapret status 2>/dev/null | grep -qi "running"; then
-            return 0
-        fi
+    # Проверяем ключевые процессы zapret
+    if pgrep -x nfqws >/dev/null 2>&1 || pgrep -x tpws >/dev/null 2>&1; then
+        return 0  # запущен
     fi
-
-    if [ -x /etc/init.d/zapret ]; then
-        if /etc/init.d/zapret status 2>/dev/null | grep -qi "running"; then
-            return 0
-        fi
-    fi
-
-    return 1
+    return 1  # остановлен/не установлен
 }
+
 
 ##############################################################################
 # ZAPRET (bol-van/zapret)
