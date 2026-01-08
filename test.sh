@@ -32,41 +32,38 @@ genderize.io
 EOF
 )
 
-# Очистка списка
+# Очистка и массив сайтов через while read
 sites_clean=$(echo "$SITES" | grep -v '^#' | grep -v '^\s*$')
 total=$(echo "$sites_clean" | wc -l)
 half=$(( (total + 1) / 2 ))
+mapfile -t sites_array < <(echo "$sites_clean")
 
-# Формируем список БЕЗ ведущего пробела
-sites_list=""
-for site in $sites_clean; do
-    [ -z "$sites_list" ] && sites_list="$site" || sites_list="$sites_list $site"
-done
-
-# Цикл вывода
-idx=1
-while [ $idx -le $half ]; do
-    left=$(echo "$sites_list" | cut -d' ' -f$idx)
-    right_idx=$((idx + half))
-    right=$(echo "$sites_list" | cut -d' ' -f$right_idx)
-
-    # Выравнивание
-    left_pad=$(printf "%-25s" "$left")
-    right_pad=$( [ -n "$right" ] && printf "%-25s" "$right" || echo "" )
-
-    # Проверка доступности
-    if curl -Is --connect-timeout 3 --max-time 4 "https://$left" >/dev/null 2>&1; then
-        left_color="[${GREEN}OK${NC}] "
+# Функция проверки
+check_site() {
+    site="$1"
+    # GET-запрос с User-Agent (как браузер), проверка HTTP 200-399
+    if curl -s --user-agent "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36" \
+            --connect-timeout 5 --max-time 8 --location \
+            -w "%{http_code}" "https://$site" | grep -q "^2[0-9][0-9]$" >/dev/null 2>&1; then
+        echo "[${GREEN}OK${NC}]"
     else
-        left_color="[${RED}FAIL${NC}] "
+        echo "[${RED}FAIL${NC}]"
     fi
+}
+
+# Цикл вывода в две колонки
+idx=0
+while [ $idx -lt $half ]; do
+    left="${sites_array[$idx]}"
+    right_idx=$((idx + half))
+    right="${sites_array[$right_idx]:-}"
+
+    left_pad=$(printf "%-25s" "$left")
+    left_color=$(check_site "$left")
 
     if [ -n "$right" ]; then
-        if curl -Is --connect-timeout 3 --max-time 4 "https://$right" >/dev/null 2>&1; then
-            right_color="[${GREEN}OK${NC}] "
-        else
-            right_color="[${RED}FAIL${NC}] "
-        fi
+        right_pad=$(printf "%-25s" "$right")
+        right_color=$(check_site "$right")
         echo -e "$left_color$left_pad $right_color$right_pad"
     else
         echo -e "$left_color$left_pad"

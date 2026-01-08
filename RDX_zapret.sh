@@ -637,48 +637,54 @@ show_menu() {
         if [ -d "$INSTALL_PATH" ] && [ -n "$(ls -A "$INSTALL_PATH" 2>/dev/null)" ]; then
             if is_zapret_running; then
                 echo -e "${YELLOW}Zapret установлен${GREEN} и работает!${NC}"
+                echo -e "${GREEN}1. Остановить zapret${NC}"
             else
                 echo -e "${YELLOW}Zapret установлен,${RED} но остановлен.${NC}"
+                echo -e "${GREEN}1. Запустить zapret${NC}"
             fi
             echo ""
+            echo "2. Проверить обновление"
+            echo -e "${YELLOW}3. Принудительно переустановить${NC}"
+            echo -e "${RED}8. Полностью удалить zapret${NC}"
+            echo ""
+            echo -e "${GREEN}0. Выйти${NC} (или Enter)"
+            echo ""
+
+            echo -n "Выберите опцию [0-3,8]: "
+            read choice
+
+            case "$choice" in
+                1)
+                    if is_zapret_running; then
+                        stop_zapret_service
+                    else
+                        start_zapret_service
+                    fi
+                    ;;
+                2) update_zapret ;;
+                3) install_zapret "true" ;;
+                8) full_uninstall_zapret ;;
+                0|"")
+                    echo ""
+                    print_info "Выход..."
+                    echo ""
+                    exit 0
+                    ;;
+                *)
+                    print_error "Неверный выбор"
+                    echo ""
+                    read -p "Нажмите Enter для продолжения..."
+                    ;;
+            esac
         else
             echo -e "${GREEN}Zapret не установлен. Начинаем установку...${NC}"
             echo ""
             install_zapret "false"
             continue
         fi
-
-        echo -e "${GREEN}1. Перезапустить zapret${NC}"
-        echo "2. Проверить обновление"
-        echo -e "${YELLOW}3. Принудительно переустановить${NC}"
-        echo "4. Протестировать работу обхода (не точно)"
-        echo -e "${RED}5. Полностью удалить zapret${NC}"
-        echo "6. Выйти"
-        echo ""
-
-        echo -n "Выберите опцию [1-6] (или Enter для выхода): "
-        read choice
-
-        case "$choice" in
-            1) start_zapret_service ;;
-            2) update_zapret ;;
-            3) install_zapret "true" ;;
-            4) test_bypass ;;
-            5) full_uninstall_zapret ;;
-            6|"")
-                echo ""
-                print_info "Выход..."
-                echo ""
-                exit 0
-                ;;
-            *)
-                print_error "Неверный выбор"
-                echo ""
-                read -p "Нажмите Enter для продолжения..."
-                ;;
-        esac
     done
 }
+
 
 ##############################################################################
 # MAIN
