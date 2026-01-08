@@ -637,20 +637,20 @@ show_menu() {
         if [ -d "$INSTALL_PATH" ] && [ -n "$(ls -A "$INSTALL_PATH" 2>/dev/null)" ]; then
             if is_zapret_running; then
                 echo -e "${YELLOW}Zapret установлен${GREEN} и работает!${NC}"
-                echo -e "${GREEN}1. Остановить zapret${NC}"
+                echo -e "${GREEN}1. Остановить zapret (вкл/выкл)${NC}"
             else
                 echo -e "${YELLOW}Zapret установлен,${RED} но остановлен.${NC}"
-                echo -e "${GREEN}1. Запустить zapret${NC}"
+                echo -e "${GREEN}1. Запустить zapret (вкл/выкл)${NC}"
             fi
             echo ""
-            echo "2. Проверить обновление"
-            echo -e "${YELLOW}3. Принудительно переустановить${NC}"
-            echo -e "${RED}8. Полностью удалить zapret${NC}"
+            echo "3. Проверить обновление"
+            echo -e "${YELLOW}5. Принудительно переустановить${NC}"
+            echo -e "${RED}6. Полностью удалить zapret${NC}"
             echo ""
             echo -e "${GREEN}0. Выйти${NC} (или Enter)"
             echo ""
 
-            echo -n "Выберите опцию [0-3,8]: "
+            echo -n "Выберите опцию [1,3,5,6,0]: "
             read choice
 
             case "$choice" in
@@ -661,9 +661,9 @@ show_menu() {
                         start_zapret_service
                     fi
                     ;;
-                2) update_zapret ;;
-                3) install_zapret "true" ;;
-                8) full_uninstall_zapret ;;
+                3) update_zapret ;;
+                5) install_zapret "true" ;;
+                6) full_uninstall_zapret ;;
                 0|"")
                     echo ""
                     print_info "Выход..."
@@ -684,6 +684,7 @@ show_menu() {
         fi
     done
 }
+
 
 
 ##############################################################################
