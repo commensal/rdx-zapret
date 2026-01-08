@@ -94,7 +94,6 @@ NFQWS_UDP_PKT_IN=0
 #NFQWS_OPT_DESYNC_STUN="--dpi-desync=fake --dpi-desync-autottl --dup=2 --dup-autottl --dup-cutoff=n3"
 #--debug=@/tmp/zapret-debug.log
 NFQWS_OPT="
---debug=@/tmp/zapret-debug.log
 --filter-tcp=80
 --hostlist=/data/zapret/ipset/zapret-hosts-user.txt
 --dpi-desync=fake,fakedsplit
