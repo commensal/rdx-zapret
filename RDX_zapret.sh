@@ -128,6 +128,23 @@ start_zapret_service() {
     return 1
 }
 
+is_zapret_running() {
+    # возвращает 0 если запущен, 1 если нет/неопределён
+    if command -v service >/dev/null 2>&1; then
+        if service zapret status 2>/dev/null | grep -qi "running"; then
+            return 0
+        fi
+    fi
+
+    if [ -x /etc/init.d/zapret ]; then
+        if /etc/init.d/zapret status 2>/dev/null | grep -qi "running"; then
+            return 0
+        fi
+    fi
+
+    return 1
+}
+
 ##############################################################################
 # ZAPRET (bol-van/zapret)
 ##############################################################################
@@ -341,25 +358,21 @@ full_uninstall_zapret() {
         print_warning "uninstall_easy.sh не найден, пропускаем"
     fi
 
-    # Чистим crontab
     if [ -f "/data/etc/crontabs/root" ]; then
         print_info "Очистка crontab от записей zapret..."
         sed -i '/zapret/d' /data/etc/crontabs/root 2>/dev/null || true
     fi
 
-    # Удаляем патчи cron
     if [ -f "/data/etc/crontabs/patches/zapret_patch.sh" ]; then
         print_info "Удаление /data/etc/crontabs/patches/zapret_patch.sh..."
         rm -f /data/etc/crontabs/patches/zapret_patch.sh 2>/dev/null || true
     fi
 
-    # Рестарт cron
     if [ -x /etc/init.d/cron ]; then
         print_info "Перезапуск cron..."
         /etc/init.d/cron restart 2>/dev/null || true
     fi
 
-    # Удаляем каталог zapret
     if [ -d "$INSTALL_PATH" ]; then
         print_info "Удаление каталога $INSTALL_PATH..."
         rm -rf "$INSTALL_PATH" 2>/dev/null || true
@@ -371,42 +384,10 @@ full_uninstall_zapret() {
 }
 
 ##############################################################################
-# УСТАНОВКА / ПЕРЕУСТАНОВКА
+# УСТАНОВКА
 ##############################################################################
-install_zapret() {
-    local force_reinstall="$1"
-
-    print_header
-
-    local actual_path="$INSTALL_PATH"
-    if [ "$TEST_MODE" = "true" ]; then
-        actual_path="/tmp/zapret_test"
-        print_info "Тестовый режим: установка в $actual_path (рабочая система не трогаем)"
-    fi
-
-    if [ "$force_reinstall" = "true" ]; then
-        if [ "$TEST_MODE" = "true" ]; then
-            print_info "Тестовый режим: проверка переустановки"
-        else
-            print_warning "Принудительная переустановка Zapret"
-        fi
-
-        stop_zapret_service
-
-        # если есть uninstall_easy.sh – попробуем корректно удалить
-        if [ -f "$actual_path/uninstall_easy.sh" ]; then
-            print_info "Запуск uninstall_easy.sh перед переустановкой..."
-            sh "$actual_path/uninstall_easy.sh"
-        fi
-
-        if [ -d "$actual_path" ]; then
-            print_info "Удаление старой папки..."
-            rm -rf "$actual_path" 2>/dev/null
-            print_success "Папка удалена"
-        fi
-    else
-        print_info "Начало установки..."
-    fi
+install_zapret_core() {
+    local actual_path="$1"
 
     print_info "Получение информации о последней версии Zapret..."
     local version
@@ -466,7 +447,6 @@ install_zapret() {
             find "$actual_path" -name "*.sh" -exec chmod +x {} \; 2>/dev/null
             print_success "Права установлены"
 
-            # патчим /opt -> /data перед install_easy
             if [ "$TEST_MODE" = "false" ]; then
                 print_info "Замена путей /opt/ -> /data/ в файлах zapret..."
                 find "$INSTALL_PATH" -type f -exec sed -i 's|/opt/|/data/|g' {} \; 2>/dev/null
@@ -500,6 +480,33 @@ install_zapret() {
     else
         print_error "Ошибка при скачивании архива Zapret"
     fi
+}
+
+install_zapret() {
+    local force_reinstall="$1"
+
+    print_header
+
+    local actual_path="$INSTALL_PATH"
+    if [ "$TEST_MODE" = "true" ]; then
+        actual_path="/tmp/zapret_test"
+        print_info "Тестовый режим: установка в $actual_path (рабочая система не трогаем)"
+    fi
+
+    if [ "$force_reinstall" = "true" ]; then
+        if [ "$TEST_MODE" = "true" ]; then
+            print_info "Тестовый режим: проверка переустановки"
+        else
+            print_warning "Принудительная переустановка Zapret"
+        fi
+
+        # используем логіку полного удаления
+        full_uninstall_zapret
+    else
+        print_info "Начало установки..."
+    fi
+
+    install_zapret_core "$actual_path"
 
     echo ""
     read -p "Нажмите Enter для продолжения..."
@@ -634,7 +641,11 @@ show_menu() {
         fi
 
         if [ -d "$INSTALL_PATH" ] && [ -n "$(ls -A "$INSTALL_PATH" 2>/dev/null)" ]; then
-            echo -e "${YELLOW}Zapret установлен. Выберите действие:${NC}"
+            if is_zapret_running; then
+                echo -e "${YELLOW}Zapret установлен${GREEN} и работает${NC}"
+            else
+                echo -e "${YELLOW}Zapret установлен,${RED} но остановлен.${NC}"
+            fi
             echo ""
         else
             echo -e "${GREEN}Zapret не установлен. Начинаем установку...${NC}"
@@ -643,22 +654,24 @@ show_menu() {
             continue
         fi
 
-        echo "1. Проверить обновление"
-        echo "2. Принудительно переустановить"
-        echo "3. Протестировать работу обхода (не точно)"
-        echo -e "${RED}4. Полностью удалить zapret${NC}"
-        echo "5. Выйти"
+        echo -e "${GREEN}1. Перезапустить zapret${NC}"
+        echo "2. Проверить обновление"
+        echo -e "${YELLOW}3. Принудительно переустановить${NC}"
+        echo "4. Протестировать работу обхода (не точно)"
+        echo -e "${RED}5. Полностью удалить zapret${NC}"
+        echo "6. Выйти"
         echo ""
 
-        echo -n "Выберите опцию [1-5] (или Enter для выхода): "
+        echo -n "Выберите опцию [1-6] (или Enter для выхода): "
         read choice
 
         case "$choice" in
-            1) update_zapret ;;
-            2) install_zapret "true" ;;
-            3) test_bypass ;;
-            4) full_uninstall_zapret ;;
-            5|"")
+            1) start_zapret_service ;;
+            2) update_zapret ;;
+            3) install_zapret "true" ;;
+            4) test_bypass ;;
+            5) full_uninstall_zapret ;;
+            6|"")
                 echo ""
                 print_info "Выход..."
                 echo ""
