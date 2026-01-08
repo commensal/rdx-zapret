@@ -40,7 +40,7 @@ sh -c "$(curl -fsSL https://raw.githubusercontent.com/commensal/rdx-zapret/main/
 **Все файлы в `/data/zapret/` (НЕ `/opt/zapret`!):**
 
 ### Основные файлы
-- `/data/zapret/config` — параметры nfqws/tpws/mode
+- `/data/zapret/config` — параметры NFQWS_OPT=
 - `/data/zapret/ipset/zapret-hosts-user.txt` — список user доменов
 - `/data/zapret/ipset/zapret-hosts-google.txt` — список google доменов
 
