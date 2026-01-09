@@ -18,9 +18,8 @@
 Возможно и какие-то другие на аналогичной платформе
 
 ## Предварительные требования ⚠️
-- **Root** уже получен ([xmir-patcher](https://github.com/openwrt-xiaomi/xmir-patcher))
+- **Root** получен ([xmir-patcher](https://github.com/openwrt-xiaomi/xmir-patcher))
 - **SSH** доступ имеется ([rd15tool](https://github.com/crazytypewriter/rd15tool/))
-- **Инструкция по руту и ssh НЕ включена** — читайте 4PDA
 - **MobaXterm** ([скачать](https://mobaxterm.mobatek.net/download.html)) для SSH/SFTP редактирования
 
 ## 🚀 Установка одной командой
