@@ -88,9 +88,9 @@ NFQWS_UDP_PKT_IN=0
 
 # just notes: --debug=@debug.log /data/zapret/lists/ /data/zapret/files/fake/
 #GoogleVideo first UDP strats!!! UDP for Quick. You maybe need change only TCP or UDP or both strats. For enable starats just delete --skip
-#Стратегия DISCORD вместо просто fake. Если закомментировать - будет использоваться просто fake
+#РЎС‚СЂР°С‚РµРіРёСЏ DISCORD РІРјРµСЃС‚Рѕ РїСЂРѕСЃС‚Рѕ fake. Р•СЃР»Рё Р·Р°РєРѕРјРјРµРЅС‚РёСЂРѕРІР°С‚СЊ - Р±СѓРґРµС‚ РёСЃРїРѕР»СЊР·РѕРІР°С‚СЊСЃСЏ РїСЂРѕСЃС‚Рѕ fake
 #NFQWS_OPT_DESYNC_DISCORD_MEDIA="--dpi-desync=fake --dpi-desync-autottl --dup=2 --dup-autottl --dup-cutoff=n3"
-#Стратегия ТГ, ВА и т.п. вместо просто fake. Если закомментировать - будет использоваться просто fake
+#РЎС‚СЂР°С‚РµРіРёСЏ РўР“, Р’Рђ Рё С‚.Рї. РІРјРµСЃС‚Рѕ РїСЂРѕСЃС‚Рѕ fake. Р•СЃР»Рё Р·Р°РєРѕРјРјРµРЅС‚РёСЂРѕРІР°С‚СЊ - Р±СѓРґРµС‚ РёСЃРїРѕР»СЊР·РѕРІР°С‚СЊСЃСЏ РїСЂРѕСЃС‚Рѕ fake
 #NFQWS_OPT_DESYNC_STUN="--dpi-desync=fake --dpi-desync-autottl --dup=2 --dup-autottl --dup-cutoff=n3"
 #--debug=@/tmp/zapret-debug.log
 NFQWS_OPT="
