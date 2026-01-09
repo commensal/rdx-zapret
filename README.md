@@ -3,7 +3,7 @@
 [![GitHub stars](https://img.shields.io/github/stars/commensal/rdx-zapret?style=social)](https://github.com/commensal/rdx-zapret)
 [![GitHub forks](https://img.shields.io/github/forks/commensal/rdx-zapret?style=social)](https://github.com/commensal/rdx-zapret)
 
-**Установщик оригинального [bol-van/zapret](https://github.com/bol-van/zapret) для рутованных "Dumb" роутеров Xiaomi rdX.**
+**Установщик оригинального [bol-van/zapret](https://github.com/bol-van/zapret) для rooted dumb Xiaomi (rdX) роутеров.**
 
 Также обратите внимание на наличие репозитория **[rdX Zapret2 Installer](https://github.com/commensal/rdx-zapret2)**
 
@@ -15,9 +15,12 @@
 | [Xiaomi Router BE3600 Pro](https://4pda.to/forum/index.php?showtopic=1096055) | [BE3600 Pro](https://4pda.to/forum/index.php?showtopic=1096055)  |
 | [Xiaomi Router BE5000 2.5G](https://4pda.to/forum/index.php?showtopic=1088946) | [BE5000](https://4pda.to/forum/index.php?showtopic=1088946) |
 
+Возможно и какие-то другие на аналогичной платформе
+
 ## Предварительные требования ⚠️
-- **Root-доступ** уже получен ([xmir-patcher](https://github.com/openwrt-xiaomi/xmir-patcher)) 
-- **Инструкция по руту НЕ включена** — читайте 4PDA
+- **Root** уже получен ([xmir-patcher](https://github.com/openwrt-xiaomi/xmir-patcher))
+- **SSH** доступ имеется ([rd15tool](https://github.com/crazytypewriter/rd15tool/))
+- **Инструкция по руту и ssh НЕ включена** — читайте 4PDA
 - **MobaXterm** ([скачать](https://mobaxterm.mobatek.net/download.html)) для SSH/SFTP редактирования
 
 ## 🚀 Установка одной командой
@@ -60,7 +63,7 @@ MobaXterm → SSH root@192.168.31.1 → SFTP → /data/zapret/
 
 **После смены стратегий или файлов ipset не забывайте перезапускать zapret (дважды опция 1 в скрипте).**
 
-**Тест только на клиентах** — файрвол Xiaomi блокирует локальные проверки.
+**Тест только на клиентах** — файрвол Xiaomi не позволяет осуществлять локальные проверки (в nfqws2 заворачиваются только FORWARD цепи).
 
 ## ⚠️ Ответственность
 
