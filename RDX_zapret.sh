@@ -44,7 +44,7 @@ for arg in "$@"; do
       echo "Использование: $0 [опции]"
       echo "Опции:"
       echo "  -debug    Включить режим отладки (подробный вывод)"
-      echo "  -test     Тестовый режим: установка в /tmp, без запуска zapret"
+      echo "  -test      Тестовый режим: установка в /tmp, без запуска zapret"
       exit 0
       ;;
   esac
@@ -127,6 +127,7 @@ start_zapret_service() {
   if command -v service >/dev/null 2>&1; then
     debug "Перезапуск через service zapret restart"
     if service zapret restart 2>/dev/null; then
+      sleep 2
       print_success "Zapret перезапущен (service)"
       return 0
     fi
@@ -135,6 +136,7 @@ start_zapret_service() {
   if [ -x /etc/init.d/zapret ]; then
     debug "Перезапуск /etc/init.d/zapret restart"
     if /etc/init.d/zapret restart 2>/dev/null; then
+      sleep 2
       print_success "zapret перезапущен (/etc/init.d)"
       return 0
     fi
