@@ -67,7 +67,7 @@ TPWS_OPT="
 
 NFQWS_ENABLE=1
 # redirect outgoing traffic with connbytes limiter applied in both directions.
-NFQWS_PORTS_TCP=80,443,4244,5222-5228,5242,50318,59234
+NFQWS_PORTS_TCP=80,443,2222,4244,5222-5228,5242,50318,59234
 NFQWS_PORTS_UDP=443,590-1400,3478-3481,5349,19294-19344
 # PKT_OUT means connbytes dir original
 # PKT_IN means connbytes dir reply
@@ -98,8 +98,7 @@ NFQWS_OPT="
 --hostlist=/data/zapret/ipset/zapret-hosts-user.txt
 --dpi-desync=fake,fakedsplit
 --dpi-desync-autottl=2
---dpi-desync-fooling=md5sig
---dpi-desync-fooling=datanoack
+--dpi-desync-fooling=md5sig,datanoack
 --new
 --filter-tcp=443
 --hostlist=/data/zapret/ipset/zapret-hosts-google.txt
@@ -109,41 +108,40 @@ NFQWS_OPT="
 --new
 --filter-tcp=443
 --hostlist=/data/zapret/ipset/zapret-hosts-user.txt
---dpi-desync=fake,fakedsplit
---dpi-desync-fake-tls-mod=rnd,rndsni,dupsid,padencap
---dpi-desync-fooling=md5sig
---dpi-desync-fooling=badsum
+--dpi-desync=multisplit
+--dpi-desync-split-seqovl=582
 --dpi-desync-split-pos=1
---dpi-desync-split-seqovl=3
+--dpi-desync-split-seqovl-pattern=/data/zapret/files/fake/stun.bin
 --new
 --filter-udp=443
 --hostlist=/data/zapret/ipset/zapret-hosts-user.txt
---dpi-desync-fake-quic=/data/zapret/files/fake/quic_initial_www_google_com.bin
---dpi-desync=fake
+--dpi-desync=fake,udplen
+--dpi-desync-udplen-increment=2
 --dpi-desync-repeats=6
 --new
---filter-udp=443,590-1400,3478-3481,5349,19294-19344
+--filter-udp=3478-3481,5349,19294-19344
 --filter-l7=stun
+--dpi-desync=disorder
+--new
+--filter-udp=443,590-1400
+--hostlist=/data/zapret/ipset/cust1.txt
 --dpi-desync=fake
-
---new
---filter-udp=443,590-1400,3478-3481,5349,19294-19344
---hostlist=/data/zapret/ipset/cust1.txt
---dpi-desync=fake,udplen
+--dpi-desync-repeats=6
 --dpi-desync-fake-quic=/data/zapret/files/fake/quic_initial_www_google_com.bin
---dpi-desync-repeats=20
---dpi-desync-udplen-increment=24
 --new
---filter-tcp=443,4244,5222-5228,5242,50318,59234
+--filter-tcp=443,2222,4244,5222-5228,5242,50318,59234
 --hostlist=/data/zapret/ipset/cust1.txt
---dpi-desync=fake,multisplit
---dpi-desync-fake-tls=0x00000000
---dpi-desync-fake-tls=!
---dpi-desync-split-pos=1,midsld
---dpi-desync-repeats=2
---dpi-desync-fooling=badseq
---dpi-desync-fake-tls-mod=rnd,dupsid,sni=www.google.com
-
+--dpi-desync=multisplit
+--dpi-desync-split-seqovl=582
+--dpi-desync-split-pos=1
+--dpi-desync-split-seqovl-pattern=/data/zapret/files/fake/stun.bin
+--new
+--filter-tcp=443,4244,2222,5222-5228,5242,50318,59234
+--ipset=/data/zapret/ipset/cust1ip.txt
+--dpi-desync=multisplit
+--dpi-desync-split-seqovl=582
+--dpi-desync-split-pos=1
+--dpi-desync-split-seqovl-pattern=/data/zapret/files/fake/stun.bin
 "
 
 
